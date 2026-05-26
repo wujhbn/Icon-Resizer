@@ -79,26 +79,46 @@ export function ImageConverter() {
       const appName = file.name.replace(/\.[^/.]+$/, "");
       
       const manifestJSON = {
-        name: appName,
-        short_name: appName.substring(0, 12),
+        name: appName || "My PWA App",
+        short_name: (appName || "App").substring(0, 12),
         display: "standalone",
         start_url: "/",
+        theme_color: "#ffffff",
+        background_color: "#ffffff",
         icons: [
           {
             src: "icon-192x192.png",
             sizes: "192x192",
-            type: "image/png"
+            type: "image/png",
+            purpose: "any"
           },
           {
             src: "icon-512x512.png",
             sizes: "512x512",
-            type: "image/png"
+            type: "image/png",
+            purpose: "any maskable"
           }
         ]
       };
       
       const manifestString = JSON.stringify(manifestJSON, null, 2);
       zip.file("manifest.json", manifestString);
+
+      const setupInstructions = `【如何讓 iPhone / iPad 顯示出 PWA 圖示？】
+
+1. 請將 apple-touch-icon.png, icon-192x192.png, icon-512x512.png, manifest.json 放在您網站的根目錄（如果您使用 React/Vite/Next.js，請放在 public/ 資料夾中）。
+2. 【最重要的一步】iPhone 的 Safari 無法只靠 manifest.json 抓到圖示，您「必須」在 HTML 程式碼中明確定出圖示路徑！
+
+請開啟您網站的 index.html，在 <head> 與 </head> 標籤之間貼上以下這段程式碼：
+
+<!-- PWA 設定 -->
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/manifest.json" />
+<meta name="theme-color" content="#ffffff" />
+
+💡 只要加上了 <link rel="apple-touch-icon" ...> 這行設定，iPhone 儲存到主畫面時就 100% 能夠正常顯示圖示囉！`;
+      
+      zip.file("設定教學(必看).txt", setupInstructions);
       
       // Inject preview manifest into document head for device previews
       const runtimeManifestJSON = { ...manifestJSON, icons: [{ src: icon192, sizes: "192x192", type: "image/png" }, { src: icon512, sizes: "512x512", type: "image/png" }] };
@@ -185,31 +205,31 @@ export function ImageConverter() {
                 </div>
                 <p className="text-slate-900 font-semibold mb-1 pointer-events-none">上傳完成</p>
                 <p className="text-slate-400 text-sm text-center truncate max-w-[200px] pointer-events-none" title={fileName}>{fileName}</p>
-                <button className="mt-6 bg-slate-100 text-slate-600 px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-slate-200 transition-all pointer-events-none">Re-upload</button>
+                <button className="mt-6 bg-slate-100 text-slate-600 px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-slate-200 transition-all pointer-events-none">重新上傳</button>
               </>
             ) : (
               <>
                 <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-4 pointer-events-none transition-colors group-hover:bg-indigo-100">
                   <Upload className={`w-8 h-8 ${isDragging ? 'text-indigo-600' : 'text-indigo-500'}`} />
                 </div>
-                <p className="text-slate-900 font-semibold mb-1 pointer-events-none">Drop source image</p>
-                <p className="text-slate-400 text-sm text-center pointer-events-none">Square (1:1) aspect ratio recommended</p>
-                <button className="mt-6 bg-slate-900 text-white px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-slate-800 transition-all pointer-events-none">Browse Files</button>
+                <p className="text-slate-900 font-semibold mb-1 pointer-events-none">拖曳圖片至此</p>
+                <p className="text-slate-400 text-sm text-center pointer-events-none">建議使用 1:1 長寬比的正方形圖片</p>
+                <button className="mt-6 bg-slate-900 text-white px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-slate-800 transition-all pointer-events-none">選擇檔案</button>
               </>
             )}
           </div>
 
           <div className="bg-indigo-900 rounded-2xl p-6 text-white hidden md:block">
-            <h3 className="font-semibold mb-2">Pro Tip</h3>
+            <h3 className="font-semibold mb-2">專業小提示</h3>
             <p className="text-indigo-200 text-sm leading-relaxed">
-              Ensure your source image is at least 512x512px for the best results across all PWA icon sets.
+              為了確保產生的圖示在各種裝置上都能保持清晰，建議您上傳至少 512x512 像素的圖片。
             </p>
           </div>
         </div>
 
         <div className="w-full md:w-2/3 bg-white rounded-3xl border border-slate-200 shadow-sm p-4 sm:p-8 flex flex-col min-h-[400px]">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-4 border-b border-slate-100 gap-4">
-            <h2 className="text-xl font-bold text-slate-900">Export Previews</h2>
+            <h2 className="text-xl font-bold text-slate-900">匯出預覽</h2>
             {zipUrl ? (
               <a
                 href={zipUrl}
@@ -218,17 +238,17 @@ export function ImageConverter() {
                 onClick={(e) => e.stopPropagation()}
               >
                 <Download className="w-5 h-5" />
-                Download All (ZIP)
+                下載全部 (ZIP)
               </a>
             ) : isProcessing ? (
               <button disabled className="flex items-center gap-2 bg-indigo-600/70 text-white px-5 py-2.5 rounded-xl font-semibold opacity-70 cursor-not-allowed w-full sm:w-auto justify-center">
                 <Loader2 className="w-5 h-5 animate-spin" />
-                Processing...
+                處理中...
               </button>
             ) : (
                 <button disabled className="flex items-center gap-2 bg-slate-100 text-slate-400 px-5 py-2.5 rounded-xl font-semibold cursor-not-allowed w-full sm:w-auto justify-center">
                   <Download className="w-5 h-5" />
-                  Download All (ZIP)
+                  下載全部 (ZIP)
                 </button>
             )}
           </div>
@@ -237,7 +257,7 @@ export function ImageConverter() {
             {!previewUrl ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-slate-400 gap-4 min-h-[200px]">
                     <ImageIcon className="w-12 h-12 opacity-20" />
-                    <p>No image uploaded yet</p>
+                    <p>尚未上傳圖片</p>
                 </div>
             ) : (
                SIZES.map((size) => (
@@ -250,9 +270,9 @@ export function ImageConverter() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-mono text-sm text-indigo-600 font-semibold truncate">{size.name}</p>
-                    <p className="text-slate-400 text-xs mt-1">Generated size: {size.size}x{size.size}px</p>
+                    <p className="text-slate-400 text-xs mt-1">產生的尺寸: {size.size}x{size.size}px</p>
                   </div>
-                  <div className="text-right pr-2 sm:pr-4 font-medium text-slate-700 text-sm hidden sm:block">Ready</div>
+                  <div className="text-right pr-2 sm:pr-4 font-medium text-slate-700 text-sm hidden sm:block">完成</div>
                 </div>
               ))
             )}
@@ -264,9 +284,9 @@ export function ImageConverter() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-mono text-sm text-indigo-600 font-semibold truncate">manifest.json</p>
-                    <p className="text-slate-400 text-xs mt-1">PWA configuration file</p>
+                    <p className="text-slate-400 text-xs mt-1">PWA 設定檔</p>
                   </div>
-                  <div className="text-right pr-2 sm:pr-4 font-medium text-slate-700 text-sm hidden sm:block">Ready</div>
+                  <div className="text-right pr-2 sm:pr-4 font-medium text-slate-700 text-sm hidden sm:block">完成</div>
                 </div>
             )}
           </div>
@@ -275,16 +295,16 @@ export function ImageConverter() {
               <div className="mt-8 pt-6 border-t border-slate-100 flex flex-wrap items-center gap-4 text-xs text-slate-400">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                  Processed locally & injected
+                  已在本地處理完成
                 </div>
                 <span className="hidden sm:inline">•</span>
-                <span className="hidden sm:inline">Try 'Add to Home Screen' now!</span>
+                <span className="hidden sm:inline">可以嘗試加到主畫面了！</span>
                 <button 
                   onClick={resetState}
                   className="ml-auto text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1 border border-indigo-100 bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors hover:bg-indigo-100"
                 >
                     <RotateCcw className="w-3.5 h-3.5" />
-                    Start Over
+                    重新轉換
                 </button>
               </div>
           )}

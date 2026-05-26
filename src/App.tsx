@@ -16,7 +16,7 @@ export default function App() {
           <span className="font-bold text-slate-800 text-xl tracking-tight">圖示轉換器</span>
         </div>
         <div className="flex gap-4 text-sm font-medium text-slate-500">
-          <span className="text-indigo-600">Converter</span>
+          <span className="text-indigo-600">轉換工具</span>
         </div>
       </nav>
 
@@ -34,8 +34,8 @@ export default function App() {
       <footer className="bg-white border-t border-slate-200 px-4 sm:px-8 py-4 flex flex-col sm:flex-row justify-between items-center text-[11px] text-slate-400 gap-4 mt-auto">
         <div>v1.0.0 Build 2024</div>
         <div className="flex gap-6 uppercase tracking-widest">
-          <span>Privacy Policy</span>
-          <span>Terms of Service</span>
+          <span>隱私權政策</span>
+          <span>服務條款</span>
         </div>
       </footer>
     </div>
