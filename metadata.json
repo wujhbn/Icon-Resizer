@@ -1,0 +1,6 @@
+{
+  "name": "Icon Resizer",
+  "description": "Resize a 1:1 image into multiple standard icon sizes and download as ZIP.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
