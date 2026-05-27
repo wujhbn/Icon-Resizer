@@ -276,19 +276,7 @@ export function ImageConverter() {
                 </div>
               ))
             )}
-            
-            {previewUrl && (
-                <div className="group flex items-center gap-4 sm:gap-6 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                  <div className="w-[60px] h-[60px] sm:w-[80px] sm:h-[80px] bg-indigo-50 rounded-lg border border-indigo-100 flex items-center justify-center flex-shrink-0">
-                    <span className="text-indigo-600 font-bold text-xs font-mono">{'{ }'}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-mono text-sm text-indigo-600 font-semibold truncate">manifest.json</p>
-                    <p className="text-slate-400 text-xs mt-1">PWA 設定檔</p>
-                  </div>
-                  <div className="text-right pr-2 sm:pr-4 font-medium text-slate-700 text-sm hidden sm:block">完成</div>
-                </div>
-            )}
+
           </div>
           
           {previewUrl && (
